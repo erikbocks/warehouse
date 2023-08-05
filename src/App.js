@@ -1,4 +1,3 @@
-import './App.css'
 import React from 'react';
 import Login from './pages/Login';
 import Signup from './pages/Signup'
@@ -7,7 +6,7 @@ import { Routes, Route} from "react-router-dom"
 
 function App() {
   return (
-    <div className={'App'}>
+    <div className={'w-screen h-screen font-inter bg-slate-50'}>
       <Routes>
           <Route path='/' element={<Login/>}/>
           <Route path='/signup' element={<Signup/>}/>
