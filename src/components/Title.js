@@ -1,13 +1,10 @@
 import { React } from 'react'
-import '../styles/Title.css'
 
 function Title() {
     return (
-        <>
-            <div className={'title'}>
-                <h1>Armazém do Bock</h1>
-            </div>
-        </>
+            <h1 className='flex items-center justify-center text-4xl h-28 font-semibold md:text-5xl'>
+                Armazém do Bock
+            </h1>
     )
 }
 
