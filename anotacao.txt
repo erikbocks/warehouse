@@ -1,0 +1,6 @@
+metas para o projeto
+
+- refatorar todo o código 
+- aplicar as boas práticas
+- utilizar tailwind css
+- implementar a api em Spring Boot
