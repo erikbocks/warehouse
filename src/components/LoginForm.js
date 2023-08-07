@@ -27,24 +27,26 @@ function LoginForm(props) {
     }
 
     return (
-        <div className={'h-96 flex flex-col items-center '}>
-            <form className={'h-72 w-screen flex flex-col justify-evenly items-center'} onSubmit={handleSubmit}>
-                <div className='w-screen h-20 flex flex-col  items-center justify-evenly'>
-                    <p className='text-xl xl:text-lg'>Email ou Usuário</p>
-                    <input className={"p-2 w-60 border  border-solid rounded-lg border-slate-500 bg-gray-100"} type={"text"} placeholder={"Email ou Usuário"} name={"login"} onChange={handleInputChange} required></input>
-                </div>
-                <div className={'h-20 w-screen flex flex-col items-center justify-evenly'}>
-                    <p className={'text-xl xl:text-lg'}>Senha</p>
-                    <input className={"p-2 w-60 border  border-solid rounded-lg border-slate-500 bg-gray-100"} type={"password"} placeholder={"Senha"} name={"password"} onChange={handleInputChange} required></input>
-                </div>
-                <div className={'w-32 h-20 flex justify-center items-center '}>
-                    <button type={"submit"} className={"h-9 w-24 rounded-full hover:scale-105 transition-all text-white bg-sky-600 hover:bg-blue-500"}>Entrar</button>
-                </div>
-            </form>
-            <span>
+        <div className={'h-2/4 flex flex-col items-center'}>
+            <div className={'bg-white rounded-3xl flex justify-evenly flex-col w-5/6 md:max-lg:w-2/5 md:max-lg:h-3/4 xl:w-1/6 h-full items-center border-2 drop-shadow-md p-4 '}>
+                <form className={'h-4/6 w-1/5 flex flex-col justify-between items-center'} onSubmit={handleSubmit}>
+                    <div className='w-screen h-20 flex flex-col  items-center justify-evenly'>
+                        <p className='text-xl xl:text-lg'>Email ou Usuário</p>
+                        <input className={"p-2 w-60 border border-solid rounded-lg border-slate-500 bg-gray-100"} type={"text"} placeholder={"Email ou Usuário"} name={"login"} onChange={handleInputChange} required></input>
+                    </div>
+                    <div className={'h-20 w-screen flex flex-col items-center justify-evenly'}>
+                        <p className={'text-xl xl:text-lg'}>Senha</p>
+                        <input className={"p-2 w-60 border  border-solid rounded-lg border-slate-500 bg-gray-100"} type={"password"} placeholder={"Senha"} name={"password"} onChange={handleInputChange} required></input>
+                    </div>
+                    <div className={'w-32 h-20 flex justify-center items-center '}>
+                        <button type={"submit"} className={"h-9 w-24 rounded-full hover:scale-105 transition-all text-white bg-sky-600 hover:bg-blue-500"}>Entrar</button>
+                    </div>
+                </form>
+                <span>
                     Não tem uma conta?
-                <Link className={'h-10 text-base underline text-blue-500'}to={"/signup"}> Criar uma conta!</Link>
-            </span>
+                    <Link className={'h-10 text-base underline text-blue-500'} to={"/signup"}> Criar uma conta!</Link>
+                </span>
+            </div>
         </div>
     )
 }
