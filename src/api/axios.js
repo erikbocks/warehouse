@@ -2,7 +2,7 @@ import axios from 'axios'
 
 async function saveUser(data) {
     try {
-        let query = await axios.post("http://localhost:3000/api/users", {
+        let query = await axios.post("http://localhost:8080/api/users", {
             username: data.username,
             password: data.password,
             email: data.email
@@ -16,9 +16,22 @@ async function saveUser(data) {
 
 async function checkUser(data) {
     try {
-        let query = await axios.post("http://localhost:8080/api/users/verify", {
+        let query = await axios.post("http://localhost:8080/api/users/find", {
             login: data.login,
             password: data.password
+        })
+
+        return query.data
+    } catch (e) {
+        console.error(e)
+    }
+}
+
+async function checkRegistry(data) {
+    try {
+        let query = await axios.post("http://localhost:8080/api/users/check", {
+            username: data.username,
+            email: data.email
         })
 
         return query.data
@@ -82,4 +95,4 @@ async function updateProduct(data) {
     }
 }
 
-export { saveUser, checkUser, getProducts, saveProduct, removeProduct, updateProduct }
+export { saveUser, checkUser, checkRegistry, getProducts, saveProduct, removeProduct, updateProduct }

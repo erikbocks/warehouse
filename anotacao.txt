@@ -4,3 +4,5 @@ metas para o projeto
 - aplicar as boas práticas
 - utilizar tailwind css
 - implementar a api em Spring Boot
+
+-mostrar erros na caixa de input

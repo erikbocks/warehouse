@@ -1,16 +1,38 @@
 import { React, useState } from 'react'
 import { Link } from "react-router-dom"
-import '../styles/SignUpForm.css'
+import FormInput from './InputForm'
 
 function SignUpForm(props) {
 
     const [signupFormData, setSignupFormData] = useState({
         email: "",
-        password: "",
-        user: ""
+        username: "",
+        password: ""
     })
 
-    const date = new Date().toLocaleString()
+    const inputs = [
+        {
+            id: 1,
+            title: "Email",
+            type: "email",
+            placeholder: "Email",
+            name: "email"
+        },
+        {
+            id: 2,
+            title: "Usuário",
+            type: "text",
+            placeholder: "Usuário",
+            name: "username"
+        },
+        {
+            id: 3,
+            title: "Senha",
+            type: "password",
+            placeholder: "Senha",
+            name: "password"
+        }
+    ]
 
     const handleSignupFormData = (event) => {
         const fieldName = event.target.getAttribute("name")
@@ -23,76 +45,58 @@ function SignUpForm(props) {
     }
 
     const verifyInfo = (data) => {
+
+        let message = ""
         const emailRegex = /^[a-zA-Z0-9.!#$%&*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/
-        const userRegex = /^[a-zA-Z0-9_.]{4,25}$/
-        const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[a-zA-Z0-9!@#$%^&*()~¥=_+}{":;'?/>.<,`-]{8,25}$/
+        const usernameRegex = /^[a-zA-Z0-9_.]{4,20}$/
+        const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[a-zA-Z0-9!@#$%^&*()~¥=_+}{":;'?/>.<,`-]{8,20}$/
 
         if (!emailRegex.test(data.email)) {
-            try {
-                alert("Digite um endereço de email valido.")
-                return
-            } catch (error) {
-                console.error(error)
-            }
+            message = "Insira um valor de email valido."
+            return message
         }
 
-        if (!userRegex.test(data.user)) {
-            try {
-                alert("Seu usuário deve de 4 a 25 , letras de A-Z, números e apenas os caracteres ( _ e .)")
-                return
-            } catch (error) {
-                console.error(error)
-            }
+        if (!usernameRegex.test(data.username)) {
+            message = "Seu usuário deve de 4 a 20 letras de A-Z, números e apenas os caracteres ( _ e .)"
+            return message
         }
 
         if (!passwordRegex.test(data.password)) {
-            try {
-                alert("Sua senha deve conter pelo menos uma letra maiúscula, uma letra minúscula, um número, um caractere especial ('!@#$%^&*') e estar entre 8-25 caracteres.")
-                return
-            } catch (error) {
-                console.error(error)
-            }
+            message = "Sua senha deve conter pelo menos uma letra maiúscula, uma letra minúscula, um número, um caractere especial ('!@#$%^&*') e estar entre 8-20 caracteres."
+            return message
         }
+
+        return message
     }
 
     function handleSubmit(e) {
         e.preventDefault()
 
-        verifyInfo(signupFormData)
+        let message = verifyInfo(signupFormData)
 
         props.onSubmit({
             email: signupFormData.email,
+            username: signupFormData.username,
             password: signupFormData.password,
-            user: signupFormData.user,
-            date: date
+            message: message
         })
     }
 
     return (
-        <div className={'signUpContainer'}>
-            <form onSubmit={handleSubmit}>
-                <div className={'signUpEmailDiv'}>
-                    <h3>Email</h3>
-                    <input className={"signUpEmailInput"} type={"email"} placeholder={"Email"} name={"email"} onChange={handleSignupFormData} required></input>
-                </div>
-
-                <div className={'signUpPasswordDiv'}>
-                    <h3>Senha</h3>
-                    <input className={"signUpPasswordInput"} type={"password"} placeholder={"Senha"} name={"password"} onChange={handleSignupFormData} required></input>
-                </div>
-
-                <div className={'signUpUserDiv'}>
-                    <h3>Usuário</h3>
-                    <input className={"signUpUserInput"} type={"text"} placeholder={"Usuário"} name={"user"} onChange={handleSignupFormData} required></input>
-                </div>
-
-                <div className={'submit'}>
-                    <button type={"submit"} className={"signUpSubmitButton"}>Cadastrar</button>
-                </div>
-
-            </form>
-            <div className={'loginLink'}>
-                <Link to="/">Entrar</Link>
+        <div className={'h-2/4 flex flex-col items-center'}>
+            <div className={'bg-white rounded-3xl flex justify-evenly flex-col w-5/6 md:max-lg:w-2/4 md:max-lg:h-3/4 xl:w-1/5 xl:h-full  items-center border-2 drop-shadow-md p-5'}>
+                <form className={'h-full w-1/5 flex flex-col justify-evenly items-center '} onSubmit={handleSubmit}>
+                    {inputs.map((input) => {
+                        return <FormInput key={input.id} {...input} handleSignupFormData={handleSignupFormData} />
+                    })}
+                    <div className={'w-32 h-20 flex justify-center items-center'} >
+                        <button className={"h-12 w-24 rounded-full hover:scale-105 transition-all text-white bg-sky-600 hover:bg-blue-500"} type={"submit"} >Cadastrar</button>
+                    </div>
+                </form>
+                <span className={'w-full h-14 text-center'}>
+                    Ja é cadastrado?
+                    <Link className={'h-10 text-base underline text-blue-500'} to="/"> Fazer login</Link>
+                </span>
             </div>
         </div>
     )

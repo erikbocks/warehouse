@@ -1,46 +1,74 @@
 import React, { useState } from 'react'
 import SignUpForm from '../components/SignUpForm'
 import ResponseAlert from '../components/ResponseAlert'
-import { saveUser } from '../api/axios'
 import Title from '../components/Title'
+import { checkRegistry, saveUser } from '../api/axios'
 
 function SignUp() {
     const [open, setOpen] = useState(false)
-    let [severity, setSeverity] = useState("error")
+    let [image, setImage] = useState({
+        imageSrc: "/error.png",
+        imageAlt: "imagem de um sinal de erro"
+    })
     let [title, setTitle] = useState("Erro")
-    let [message, setMessage] = useState("Ocorreu um erro. Tente novamente mais tarde.")
+    let [message, setMessage] = useState("Ocorreu um erro. Tente novamente mais tarde")
 
     async function registerUser(data) {
-        let save = await saveUser(data)
 
-        if (save === "registered") {
-            setSeverity("success")
-            setTitle("Concluído")
-            setMessage("Sua conta foi criada com sucesso!")
+        if (data.message.length > 0) {
+            setImage({ imageSrc: "/warning.png", imageAlt: "imagem de um triangulo com exclamação" })
+            setTitle("Revise as informações.")
+            setMessage(data.message)
+            setOpen(true)
+            return
         }
 
-        if (save === "already registered") {
-            setSeverity("info")
-            setTitle("Ops...")
+        let check = await checkRegistry(data)
+
+        if (check === undefined) {
+            setImage({
+                imageSrc: "/error.png",
+                imageAlt: "imagem de um sinal de erro"
+            })
+            setTitle("Erro")
+            setMessage("Ocorreu um erro. Tente novamente mais tarde.")
+            setOpen(true)
+            return
+        }
+
+        if (check.length > 0) {
+            setTitle("Dados incorretos.")
             setMessage("Credenciais já registradas.")
+            setImage({ imageSrc: "/warning.png", imageAlt: "imagem de um triangulo com exclamação" })
+            setOpen(true)
+            return
         }
 
+        setTitle("Concluído")
+        setMessage("Sua conta foi criada com sucesso!")
+        setImage({
+            imageSrc: "/correct.png",
+            imageAlt: "imagem de círculo com simbolo de correto"
+        })
         setOpen(true)
+
+        await saveUser(data)
+
     }
 
     let infos = {
         open: open,
-        severity: severity,
+        image: image,
         title: title,
         message: message
     }
 
     return (
-        <>
+        <div className={'w-screen h-screen flex flex-col justify-center'}>
             <Title />
             <SignUpForm onSubmit={registerUser} />
-            <ResponseAlert data={infos} />
-        </>
+            <ResponseAlert data={infos} visible={open} setOpen={setOpen} />
+        </div>
     )
 }
 
