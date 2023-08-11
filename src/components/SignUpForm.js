@@ -1,6 +1,6 @@
 import { React, useState } from 'react'
 import { Link } from "react-router-dom"
-import FormInput from './InputForm'
+import UserFormInput from './UserFormInput'
 
 function SignUpForm(props) {
 
@@ -47,9 +47,9 @@ function SignUpForm(props) {
     const verifyInfo = (data) => {
 
         let message = ""
-        const emailRegex = /^[a-zA-Z0-9.!#$%&*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/
+        const emailRegex = /^[a-zA-Z0-9._]{3,20}@[a-zA-Z]+(?:.[a-zA-Z0-9-])+$/
         const usernameRegex = /^[a-zA-Z0-9_.]{4,20}$/
-        const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[a-zA-Z0-9!@#$%^&*()~¥=_+}{":;'?/>.<,`-]{8,20}$/
+        const passwordRegex = /^(?=.*\d)(?=.*[A-Z])(?=.*[a-z])(?=.*[^\w\d\s:])([^\s]){8,20}$/
 
         if (!emailRegex.test(data.email)) {
             message = "Insira um valor de email valido."
@@ -84,10 +84,10 @@ function SignUpForm(props) {
 
     return (
         <div className={'h-2/4 flex flex-col items-center'}>
-            <div className={'bg-white rounded-3xl flex justify-evenly flex-col w-5/6 md:max-lg:w-2/4 md:max-lg:h-3/4 xl:w-1/5 xl:h-full  items-center border-2 drop-shadow-md p-5'}>
+            <div className={'bg-white rounded-3xl flex justify-evenly flex-col w-5/6 md:max-lg:w-2/4 md:max-lg:h-3/4 xl:w-1/5 xl:h-full items-center border-2 drop-shadow-md p-5'}>
                 <form className={'h-full w-1/5 flex flex-col justify-evenly items-center '} onSubmit={handleSubmit}>
                     {inputs.map((input) => {
-                        return <FormInput key={input.id} {...input} handleInputChange={handleInputChange} />
+                        return <UserFormInput key={input.id} {...input} handleInputChange={handleInputChange} />
                     })}
                     <div className={'w-32 h-20 flex justify-center items-center'} >
                         <button className={"h-12 w-24 rounded-full hover:scale-105 transition-all text-white bg-sky-600 hover:bg-blue-500"} type={"submit"} >Cadastrar</button>

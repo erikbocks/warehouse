@@ -1,7 +1,9 @@
 import { React } from 'react'
-import '../styles/TableRow.css'
 
 function TableRow(props) {
+
+    console.log(props)
+
     return (
         props.products.map((product) => {
             return <tr key={product.item_id}>

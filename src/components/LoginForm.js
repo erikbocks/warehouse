@@ -1,6 +1,6 @@
 import { React, useState } from 'react'
 import { Link } from "react-router-dom"
-import FormInput from './InputForm'
+import UserFormInput from './UserFormInput'
 
 function LoginForm(props) {
     const [loginFormData, setFormData] = useState({
@@ -26,6 +26,7 @@ function LoginForm(props) {
     ]
 
     const handleInputChange = (event) => {
+        
         const fieldName = event.target.getAttribute('name')
         const fieldValue = event.target.value
 
@@ -49,7 +50,7 @@ function LoginForm(props) {
             <div className={'bg-white rounded-3xl flex justify-evenly flex-col w-5/6 md:max-lg:w-3/6 md:max-lg:h-3/4 xl:w-1/5 h-full items-center border-2 drop-shadow-md '}>
                 <form className={'h-4/6 w-1/5 flex flex-col justify-between items-center'} onSubmit={handleSubmit}>
                     {inputs.map((input) => {
-                        return <FormInput key={input.id} {...input} handleInputChange={handleInputChange} />
+                        return <UserFormInput key={input.id} {...input} handleInputChange={handleInputChange} />
                     })}
                     <div className={'w-32 h-20 flex justify-center items-center'}>
                         <button type={"submit"} className={"h-12 w-24 rounded-full hover:scale-105 transition-all text-white bg-sky-600 hover:bg-blue-500"}>Entrar</button>

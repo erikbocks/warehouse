@@ -2,7 +2,7 @@ metas para o projeto
 
 - refatorar todo o código 
 - aplicar as boas práticas
-- utilizar tailwind css
-- implementar a api em Spring Boot
+- utilizar tailwind css // feito
+- implementar a api em Spring Boot // feito
 
--mostrar erros na caixa de input
+- title responsivo // feito

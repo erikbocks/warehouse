@@ -16,7 +16,7 @@ async function saveUser(data) {
 
 async function checkUser(data) {
     try {
-        let query = await axios.post("http://localhost:8080/api/users/find", {
+        let query = await axios.post("http://192.168.0.106:8080/api/users/find", {
             login: data.login,
             password: data.password
         })
@@ -42,8 +42,7 @@ async function checkRegistry(data) {
 
 async function getProducts(id) {
     try {
-
-        let query = await axios.get(`http://localhost:4000/products/${id}`)
+        let query = await axios.get(`http://localhost:8080/api/products/${id}`)
 
         return query.data
     } catch (e) {

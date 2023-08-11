@@ -2,8 +2,8 @@ import { React, useEffect, useState } from 'react'
 import { saveProduct, getProducts, removeProduct } from '../api/axios'
 import { nanoid } from 'nanoid'
 import TableRow from './TableRow'
-import ModalEditProduct from './ModalEditProduct'
-import '../styles/Table.css'
+import ProductFormInput from './ProductFormInput'
+import ValueFormInput from './ValueFormInput'
 
 function Table() {
     const userId = sessionStorage.getItem("userId")
@@ -11,27 +11,24 @@ function Table() {
     const [forceUpdate, setForceUpdate] = useState(true)
     const [productKey, setProductKey] = useState()
     const [open, setOpen] = useState(false)
-    const [productBeingEdited, setproductBeingEdited] = useState()
 
     const [productFormData, setProductFormData] = useState({
         product: "",
         amount: "",
+        value: ""
     })
 
-    // faz um GET nos produtos cadastrados com o ID do usuário
     useEffect(() => {
-        getProducts(userId).then((res) => { // res = lista de produtos
+        getProducts(userId).then((res) => {
             setProducts(res)
             setForceUpdate(false)
         })
     }, [userId, forceUpdate])
 
-    // lida com a mudança do state e deleta o produto escolhido.
     useEffect(() => {
         deleteRow(productKey)
     }, [productKey])
 
-    // lida com a mudança do input
     const handleProductFormChange = (e) => {
 
         const fieldName = e.target.getAttribute('name')
@@ -43,19 +40,13 @@ function Table() {
         })
     }
 
-    // lida com o envio do formulário e salva o novo produto
     async function handleSubmit(e) {
         e.preventDefault()
-
-        const added_on = new Date().toLocaleString()
-        const last_edit = new Date().toLocaleString()
 
         const newProduct = {
             item_id: nanoid(),
             item: productFormData.product,
             amount: productFormData.amount,
-            added_on: added_on,
-            last_edit: last_edit,
             owner_id: userId
         }
 
@@ -64,7 +55,6 @@ function Table() {
         setForceUpdate(true)
     }
 
-    // deleta a linha do banco
     async function deleteRow(item_id) {
         if (!item_id) {
             return
@@ -75,23 +65,40 @@ function Table() {
         setForceUpdate(true)
     }
 
+    const inputs = [
+        {
+            id: 1,
+            type: "text",
+            placeholder: "Nome do Produto",
+            name: "product",
+        },
+        {
+            id: 2,
+            type: "number",
+            placeholder: "Quantidade do Produto",
+            name: "amount",
+        }
+    ]
+
+    // console.log(products)
+
     return (
-        <>
-            <div className={'formContainer'}>
-                <form onSubmit={handleSubmit}>
-                    <div className={'productsInputsDiv'}>
-                        <div>
-                            <input className={"productNameInput"} type={"text"} placeholder={"Nome do Produto"} name={"product"} onChange={handleProductFormChange} minLength={1} maxLength={50} required ></input>
-                        </div>
-                        <div>
-                            <input className={"productAmountInput"} type={"number"} placeholder={"Quantidade"} name={"amount"} onChange={handleProductFormChange} min={1} max={9999} required></input>
-                        </div>
-                        <div>
-                            <button className={"productSubmitButton"} >Adicionar</button>
-                        </div>
+        <div className='h-full'>
+            <div className={'w-full h-2/6 flex justify-center xl:h-1/6 md:max-lg:h-1/6 '}>
+                <form className={"h-full w-full flex flex-col items-center md:max-lg:h-1/5 md:max-lg:flex-row xl:h-1/5 xl:flex-row xl:w-4/6"} onSubmit={handleSubmit}>
+
+                    {inputs.map((input) => {
+                        return <ProductFormInput key={input.id} {...input} handleProductFormChange={handleProductFormChange} />
+                    })}
+
+                    <ValueFormInput productFormData={productFormData} setProductFormData={setProductFormData} handleProductFormChange={handleProductFormChange} />
+
+                    <div className={"w-2/4 h-20 flex justify-evenly items-center md:max-lg:justify-start md:max-lg:items-center md:max-lg:w-1/4"}>
+                        <button className={"h-10 w-full rounded-full hover:scale-105 transition-all md:max-lg:w-4/5 md:max-lg:h-12 text-white bg-sky-600 hover:bg-blue-500"} >Adicionar</button>
                     </div>
                 </form>
             </div>
+
             <div className={'tableContainer'}>
                 <table className={"table"}>
                     <thead>
@@ -103,12 +110,11 @@ function Table() {
                         </tr>
                     </thead>
                     <tbody>
-                        <TableRow products={products} setProductKey={setProductKey} setProductId={setproductBeingEdited} setOpen={setOpen} />
-                        {open && <ModalEditProduct setForceUpdate={setForceUpdate} productBeingEdited={productBeingEdited} open={open} setOpen={setOpen} />}
+                        <TableRow products={products} setProductKey={setProductKey} setOpen={setOpen} />
                     </tbody>
                 </table>
             </div>
-        </>
+        </div>
     )
 }
 

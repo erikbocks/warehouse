@@ -53,7 +53,6 @@ function SignUp() {
         setOpen(true)
 
         await saveUser(data)
-
     }
 
     let infos = {
