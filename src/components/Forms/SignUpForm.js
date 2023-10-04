@@ -1,6 +1,6 @@
 import { React, useState } from 'react'
 import { Link } from "react-router-dom"
-import UserFormInput from './UserFormInput'
+import UserFormInput from '../Inputs/UserFormInput'
 
 function SignUpForm(props) {
 
@@ -33,16 +33,6 @@ function SignUpForm(props) {
             name: "password"
         }
     ]
-
-    const handleInputChange = (event) => {
-        const fieldName = event.target.getAttribute("name")
-        const fieldValue = event.target.value
-
-        setSignupFormData({
-            ...signupFormData,
-            [fieldName]: fieldValue
-        })
-    }
 
     const verifyInfo = (data) => {
 
@@ -87,7 +77,7 @@ function SignUpForm(props) {
             <div className={'bg-white rounded-3xl flex justify-evenly flex-col w-5/6 md:max-lg:w-2/4 md:max-lg:h-3/4 xl:w-1/5 xl:h-full items-center border-2 drop-shadow-md p-5'}>
                 <form className={'h-full w-1/5 flex flex-col justify-evenly items-center '} onSubmit={handleSubmit}>
                     {inputs.map((input) => {
-                        return <UserFormInput key={input.id} {...input} handleInputChange={handleInputChange} />
+                        return <UserFormInput key={input.id} {...input} formData={signupFormData} setFormData={setSignupFormData} />
                     })}
                     <div className={'w-32 h-20 flex justify-center items-center'} >
                         <button className={"h-12 w-24 rounded-full hover:scale-105 transition-all text-white bg-sky-600 hover:bg-blue-500"} type={"submit"} >Cadastrar</button>

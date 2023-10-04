@@ -1,8 +1,9 @@
 import { React } from 'react'
+import { InputChangeHandler } from '../../utils/InputChangeHandler'
 
 function ProductFormInput(props) {
 
-    const { type, placeholder, name, handleProductFormChange } = props
+    const { type, placeholder, name, productFormData, setProductFormData } = props
 
     return (
         <div className={'w-full h-20 flex justify-evenly items-center md:max-lg:w-2/4'}>
@@ -11,7 +12,7 @@ function ProductFormInput(props) {
                 type={type}
                 placeholder={placeholder}
                 name={name}
-                onChange={handleProductFormChange}
+                onChange={(e) => InputChangeHandler(e, productFormData, setProductFormData)}
                 required></input>
         </div>
     )

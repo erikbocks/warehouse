@@ -1,4 +1,4 @@
-function currencyMask(e) {
+export function currencyMask(e) {
     e.target.maxLength = 13
     let value = e.target.value
     value = value.replace(/\D/g, "")
@@ -7,5 +7,3 @@ function currencyMask(e) {
     e.target.value = value
     return e
 }
-
-export default currencyMask

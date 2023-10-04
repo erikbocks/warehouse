@@ -1,19 +1,19 @@
 import { React, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { checkUser} from '../api/axios';
-import LoginForm from '../components/LoginForm';
+import { checkUser } from '../api/axios';
+import LoginForm from '../components/Forms/LoginForm';
 import ResponseAlert from '../components/ResponseAlert';
 import Title from '../components/Title';
 
 function Login() {
     const navigate = useNavigate()
     const [open, setOpen] = useState(false)
+    let [title, setTitle] = useState("Erro")
+    let [message, setMessage] = useState("Ocorreu um erro. Tente novamente mais tarde.")
     let [image, setImage] = useState({
         imageSrc: "/error.png",
         imageAlt: "imagem de um sinal de erro"
     })
-    let [title, setTitle] = useState("Erro")
-    let [message, setMessage] = useState("Ocorreu um erro. Tente novamente mais tarde.")
 
     async function checkLogin(data) {
 
@@ -24,16 +24,16 @@ function Login() {
             return query
         }
 
-        if (query === null) {
-            setImage({imageSrc: "/warning.png", imageAlt: "imagem de um triangulo com exclamação"})
+        if (query.result === null) {
+            setImage({ imageSrc: "/warning.png", imageAlt: "imagem de um triangulo com exclamação" })
             setTitle("Dados incorretos")
             setMessage("Login ou Senha incorretos.")
             setOpen(true)
             return query
         }
 
-        if (query != null) {
-            setImage({imageSrc: "/correct.png", imageAlt: "imagem de círculo com simbolo de correto"})
+        if (query.result != null) {
+            setImage({ imageSrc: "/correct.png", imageAlt: "imagem de círculo com simbolo de correto" })
             setTitle("Autenticado!")
             setMessage("Você vai ser redirecionado em alguns instantes.")
             setOpen(true)
@@ -44,11 +44,11 @@ function Login() {
     async function redirect(data) {
         let check = await checkLogin(data)
 
-        if (check !== undefined) {
+        if (check.result !== undefined && check.result !== null) {
 
-            sessionStorage.setItem('userId', JSON.stringify(check.id))
+            sessionStorage.setItem('userId', JSON.stringify(check.result.id))
 
-            setTimeout(()=> navigate('/home'), 5000)
+            setTimeout(() => navigate('/home'), 5000)
         }
     }
 
@@ -61,8 +61,8 @@ function Login() {
     return (
         <div className={'w-screen h-screen flex flex-col items-center justify-center overflow-hidden'}>
             <Title />
-            <LoginForm  onSubmit={redirect}/>  
-            <ResponseAlert data={infos} visible={open} setOpen={setOpen} />
+            <LoginForm onSubmit={redirect} />
+            {open && <ResponseAlert data={infos} visible={open} setOpen={setOpen} />}
         </div>
     )
 }

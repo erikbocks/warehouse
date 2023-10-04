@@ -1,120 +1,122 @@
 import { React, useEffect, useState } from 'react'
-import { saveProduct, getProducts, removeProduct } from '../api/axios'
-import { nanoid } from 'nanoid'
+import { getProducts, removeProduct, updateProduct } from '../api/axios'
+import { ConfirmationAlert } from './ConfirmationAlert'
 import TableRow from './TableRow'
-import ProductFormInput from './ProductFormInput'
-import ValueFormInput from './ValueFormInput'
+import ProductForm from './Forms/ProductForm'
+import ProductInfoModal from './ProductInfoModal'
+import { PageSelector } from './PageSelector'
+import { Link } from 'react-router-dom'
 
 function Table() {
     const userId = sessionStorage.getItem("userId")
-    const [products, setProducts] = useState([])
-    const [forceUpdate, setForceUpdate] = useState(true)
-    const [productKey, setProductKey] = useState()
-    const [open, setOpen] = useState(false)
 
+    const [products, setProducts] = useState([])
+    const [totalPages, setTotalPages] = useState(0)
+    const [selectedPage, setSelectedPage] = useState(0)
+    const [pagesDisabled, setPagesDisabled] = useState({
+        left: false,
+        right: false
+    })
+    const [clickedProduct, setClickedProduct] = useState({})
+    const [open, setOpen] = useState(false)
+    const [forceUpdate, setForceUpdate] = useState(false)
+    const [productKey, setProductKey] = useState(0)
+    const [openDeleteConfirmation, setOpenDeleteConfirmation] = useState(false)
     const [productFormData, setProductFormData] = useState({
         product: "",
         amount: "",
         value: ""
     })
 
+    function cleanClickedProduct() {
+        setClickedProduct({})
+        setProductKey(0)
+    }
+
+    async function updateEditedProduct(modalProduct) {
+
+        let toUpdateProduct = {
+            id: productKey,
+            product: modalProduct.product,
+            amount: modalProduct.amount,
+            value: modalProduct.value
+        }
+
+        await updateProduct(toUpdateProduct)
+
+        setForceUpdate(true)
+    }
+
+    async function eraseClickedProduct() {
+        await removeProduct(productKey)
+        setOpen(false)
+        cleanClickedProduct()
+        setForceUpdate(true)
+    }
+
+    function incrementPage() {
+        setSelectedPage(selectedPage + 1)
+    }
+
+    function decrementPage() {
+        setSelectedPage(selectedPage - 1)
+    }
+
     useEffect(() => {
-        getProducts(userId).then((res) => {
-            setProducts(res)
+        getProducts(userId, selectedPage).then((res) => {
+            setProducts(res.result.content)
+            setTotalPages(res.result.totalPages)
             setForceUpdate(false)
         })
-    }, [userId, forceUpdate])
+    }, [userId, forceUpdate, selectedPage])
 
     useEffect(() => {
-        deleteRow(productKey)
+        setClickedProduct(products.find((product) => product.id === productKey))
     }, [productKey])
 
-    const handleProductFormChange = (e) => {
+    useEffect(() => {
 
-        const fieldName = e.target.getAttribute('name')
-        const fieldValue = e.target.value
+        setPagesDisabled({ left: false, right: false })
 
-        setProductFormData({
-            ...productFormData,
-            [fieldName]: fieldValue
-        })
-    }
+        if (selectedPage === 0) setPagesDisabled({ ...pagesDisabled, left: true })
 
-    async function handleSubmit(e) {
-        e.preventDefault()
 
-        const newProduct = {
-            item_id: nanoid(),
-            item: productFormData.product,
-            amount: productFormData.amount,
-            owner_id: userId
-        }
+        if (selectedPage === (totalPages - 1)) setPagesDisabled({ ...pagesDisabled, right: true })
 
-        await saveProduct(newProduct)
-
-        setForceUpdate(true)
-    }
-
-    async function deleteRow(item_id) {
-        if (!item_id) {
-            return
-        }
-
-        await removeProduct(item_id)
-
-        setForceUpdate(true)
-    }
-
-    const inputs = [
-        {
-            id: 1,
-            type: "text",
-            placeholder: "Nome do Produto",
-            name: "product",
-        },
-        {
-            id: 2,
-            type: "number",
-            placeholder: "Quantidade do Produto",
-            name: "amount",
-        }
-    ]
-
-    // console.log(products)
+    }, [selectedPage])
 
     return (
-        <div className='h-full'>
-            <div className={'w-full h-2/6 flex justify-center xl:h-1/6 md:max-lg:h-1/6 '}>
-                <form className={"h-full w-full flex flex-col items-center md:max-lg:h-1/5 md:max-lg:flex-row xl:h-1/5 xl:flex-row xl:w-4/6"} onSubmit={handleSubmit}>
-
-                    {inputs.map((input) => {
-                        return <ProductFormInput key={input.id} {...input} handleProductFormChange={handleProductFormChange} />
-                    })}
-
-                    <ValueFormInput productFormData={productFormData} setProductFormData={setProductFormData} handleProductFormChange={handleProductFormChange} />
-
-                    <div className={"w-2/4 h-20 flex justify-evenly items-center md:max-lg:justify-start md:max-lg:items-center md:max-lg:w-1/4"}>
-                        <button className={"h-10 w-full rounded-full hover:scale-105 transition-all md:max-lg:w-4/5 md:max-lg:h-12 text-white bg-sky-600 hover:bg-blue-500"} >Adicionar</button>
-                    </div>
-                </form>
+        <div className={"w-full h-5/6 flex flex-col justify-center items-center "}>
+            <div className={'w-full h-2/6 flex justify-center items-center md:max-lg:h-24 xl:h-20 '}>
+                <ProductForm productFormData={productFormData} setProductFormData={setProductFormData} userId={userId} setForceUpdate={setForceUpdate} />
             </div>
-
-            <div className={'tableContainer'}>
-                <table className={"table"}>
+            <div className={'w-full h-72 flex justify-center items-center'}>
+                <table className={"w-11/12 h-2/6 rounded-2xl table-fixed border-1 drop-shadow-md bg-white md:max-lg:w-5/6 xl:w-2/3"}>
                     <thead>
-                        <tr>
-                            <th className={"tableHead"}>Produto</th>
-                            <th className={"tableHead"}>Quantidade</th>
-                            <th className={"tableHead"}>Cadastrado em</th>
-                            <th className={"tableHead"}>Ultima Edição</th>
+                        <tr className={"w-full shadow-md"}>
+                            <th className={"p-2"}>Produto</th>
+                            <th className={"p-2"}>Qtd</th>
+                            <th className={"p-2"}>Valor</th>
+                            {window.innerWidth > 768 && <th className={"p-2"}>Adicionado em</th>}
+                            {window.innerWidth > 768 && <th className={"p-2"}>Ultima edição</th>}
+                            <th className={"p-2"}>Ações</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <TableRow products={products} setProductKey={setProductKey} setOpen={setOpen} />
+                        {products && products.map((product) => {
+                            return <TableRow key={product.id} product={product} setOpen={setOpen} setProductKey={setProductKey} />
+                        })}
                     </tbody>
                 </table>
+                {clickedProduct?.id && <ProductInfoModal clickedProduct={clickedProduct} productKey={productKey} open={open} setOpen={setOpen} cleanup={cleanClickedProduct} updateEditedProduct={updateEditedProduct} setOpenDeleteConfirmation={setOpenDeleteConfirmation} />}
+                {openDeleteConfirmation && <ConfirmationAlert setOpenDeleteConfirmation={setOpenDeleteConfirmation} eraseClickedProduct={eraseClickedProduct} />}
             </div>
-        </div>
+            <PageSelector totalPages={totalPages} incrementPage={incrementPage} decrementPage={decrementPage} pagesDisabled={pagesDisabled} selectedPage={selectedPage} />
+            <div className={"w-2/5 h-12 flex justify-center items-center"}>
+                <img src={"/user.png"} alt={"Silhueta de uma pessoa dentro de um círculo"}></img>
+                <Link className={"text-gray-500 underline"} to={"/account"}>Minha conta</Link>
+            </div>
+        </div >
     )
 }
 

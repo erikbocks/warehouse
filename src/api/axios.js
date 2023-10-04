@@ -29,9 +29,9 @@ async function checkUser(data) {
 
 async function checkRegistry(data) {
     try {
-        let query = await axios.post("http://localhost:8080/api/users/check", {
-            username: data.username,
-            email: data.email
+        let query = await axios.post("http://192.168.0.106:8080/api/users/check", {
+            email: data.email,
+            username: data.username
         })
 
         return query.data
@@ -40,9 +40,9 @@ async function checkRegistry(data) {
     }
 }
 
-async function getProducts(id) {
+async function getProducts(id, selectedPage) {
     try {
-        let query = await axios.get(`http://localhost:8080/api/products/${id}`)
+        let query = await axios.get(`http://192.168.0.106:8080/api/products/${id}?page=${selectedPage}`)
 
         return query.data
     } catch (e) {
@@ -52,13 +52,12 @@ async function getProducts(id) {
 
 async function saveProduct(data) {
     try {
-        let query = await axios.post("http://localhost:4000/products/save", {
-            item_id: data.item_id,
-            item: data.item,
+
+        let query = await axios.post("http://localhost:8080/api/products", {
+            product: data.product,
             amount: data.amount,
-            added_on: data.added_on,
-            last_edit: data.last_edit,
-            owner_id: data.owner_id
+            value: data.value,
+            owner: data.owner
         })
 
         return query.data
@@ -67,11 +66,10 @@ async function saveProduct(data) {
     }
 }
 
-async function removeProduct(data) {
+async function removeProduct(id) {
     try {
-        let query = await axios.post("http://localhost:4000/products/remove", {
-            item_id: data
-        })
+
+        let query = await axios.delete(`http://localhost:8080/api/products/${id}`)
 
         return query
     } catch (e) {
@@ -81,11 +79,11 @@ async function removeProduct(data) {
 
 async function updateProduct(data) {
     try {
-        let query = await axios.patch("http://localhost:4000/products/update", {
+        let query = await axios.put("http://localhost:8080/api/products", {
+            id: data.id,
             product: data.product,
             amount: data.amount,
-            last_edit: data.last_edit,
-            item_id: data.item_id
+            value: data.value
         })
 
         return query

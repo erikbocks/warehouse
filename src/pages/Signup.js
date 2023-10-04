@@ -1,8 +1,8 @@
-import React, { useState } from 'react'
-import SignUpForm from '../components/SignUpForm'
+import { React, useState } from 'react'
+import { checkRegistry, saveUser } from '../api/axios'
+import SignUpForm from '../components/Forms/SignUpForm'
 import ResponseAlert from '../components/ResponseAlert'
 import Title from '../components/Title'
-import { checkRegistry, saveUser } from '../api/axios'
 
 function SignUp() {
     const [open, setOpen] = useState(false)
@@ -14,14 +14,6 @@ function SignUp() {
     let [message, setMessage] = useState("Ocorreu um erro. Tente novamente mais tarde")
 
     async function registerUser(data) {
-
-        if (data.message.length > 0) {
-            setImage({ imageSrc: "/warning.png", imageAlt: "imagem de um triangulo com exclamação" })
-            setTitle("Revise as informações.")
-            setMessage(data.message)
-            setOpen(true)
-            return
-        }
 
         let check = await checkRegistry(data)
 
@@ -36,9 +28,9 @@ function SignUp() {
             return
         }
 
-        if (check.length > 0) {
+        if (check.messages.length > 0) {
             setTitle("Dados incorretos.")
-            setMessage("Credenciais já registradas.")
+            setMessage(check.messages)
             setImage({ imageSrc: "/warning.png", imageAlt: "imagem de um triangulo com exclamação" })
             setOpen(true)
             return
@@ -66,7 +58,7 @@ function SignUp() {
         <div className={'w-screen h-screen flex flex-col justify-center'}>
             <Title />
             <SignUpForm onSubmit={registerUser} />
-            <ResponseAlert data={infos} visible={open} setOpen={setOpen} />
+            {open && <ResponseAlert data={infos} setOpen={setOpen} />}
         </div>
     )
 }

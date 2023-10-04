@@ -6,3 +6,5 @@ metas para o projeto
 - implementar a api em Spring Boot // feito
 
 - title responsivo // feito
+- implementar o spring security
+- fazer minha própria response entity // feito
