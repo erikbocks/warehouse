@@ -1,9 +1,9 @@
 import { React, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { checkUser } from '../api/axios';
-import LoginForm from '../components/Forms/LoginForm';
-import ResponseAlert from '../components/ResponseAlert';
-import Title from '../components/Title';
+import { checkUser } from '../../api/axios';
+import LoginForm from '../Forms/LoginForm';
+import ResponseAlert from '../ResponseAlert';
+import Title from '../Title';
 
 function Login() {
     const navigate = useNavigate()
@@ -12,41 +12,39 @@ function Login() {
     let [message, setMessage] = useState("Ocorreu um erro. Tente novamente mais tarde.")
     let [image, setImage] = useState({
         imageSrc: "/error.png",
-        imageAlt: "imagem de um sinal de erro"
+        imageAlt: "imagem de um círculo com um X no centro indicando erro"
     })
 
     async function checkLogin(data) {
+        let response = await checkUser(data)
 
-        let query = await checkUser(data)
-
-        if (query === undefined) {
-            setOpen(true)
-            return query
-        }
-
-        if (query.result === null) {
+        if (response.status === 400) {
             setImage({ imageSrc: "/warning.png", imageAlt: "imagem de um triangulo com exclamação" })
             setTitle("Dados incorretos")
             setMessage("Login ou Senha incorretos.")
             setOpen(true)
-            return query
+            return response
         }
 
-        if (query.result != null) {
+        if (response.status === 200) {
             setImage({ imageSrc: "/correct.png", imageAlt: "imagem de círculo com simbolo de correto" })
             setTitle("Autenticado!")
             setMessage("Você vai ser redirecionado em alguns instantes.")
             setOpen(true)
-            return query
+            return response
         }
+
+        setOpen(true)
+        return response
     }
 
     async function redirect(data) {
-        let check = await checkLogin(data)
+        let response = await checkLogin(data)
 
-        if (check.result !== undefined && check.result !== null) {
+        if (response.result !== undefined && response.result !== null) {
 
-            sessionStorage.setItem('userId', JSON.stringify(check.result.id))
+            sessionStorage.setItem('userId', JSON.stringify(response.result.id))
+            sessionStorage.setItem('authToken', `Bearer ${response.result.token}`)
 
             setTimeout(() => navigate('/home'), 5000)
         }

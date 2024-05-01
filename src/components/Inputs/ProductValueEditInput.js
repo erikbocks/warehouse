@@ -1,6 +1,6 @@
 import { React } from "react"
-import { InputChangeHandler } from "../../utils/InputChangeHandler"
-import { currencyMask } from "../../utils/CurrencyMask"
+import { currencyMask } from '../utils/CurrencyMask'
+import { InputChangeHandler } from "../utils/InputChangeHandler"
 
 function ProductValueEditInput(props) {
     let { productData, setProductData, disabled } = props
