@@ -1,10 +1,8 @@
 import axios from 'axios'
 
-// user
-
-function checkUser(data) {
+function authenticateUser(data) {
     try {
-        return axios.post("http://192.168.0.106:8080/auth/login", {
+        return axios.post("http://192.168.0.106:8080/api/auth/login", {
             login: data.login,
             password: data.password
         }).then((response) => {
@@ -39,9 +37,9 @@ function saveUser(data) {
     }
 }
 
-function getUser(data, token) {
+function getUser(token) {
     try {
-        return axios.get(`http://192.168.0.106:8080/api/users/${data}`, { headers: { Authorization: token } })
+        return axios.get(`http://192.168.0.106:8080/api/users/find`, { headers: { Authorization: token } })
             .then((response) => {
                 return response.data
             }).catch((error) => {
@@ -55,7 +53,7 @@ function getUser(data, token) {
     }
 }
 
-function updateUser(data, token) {
+function updateUserData(data, token) {
     try {
         return axios.put("http://192.168.0.106:8080/api/users/update", {
             id: data.userId,
@@ -164,4 +162,4 @@ function updateProduct(data, token) {
     }
 }
 
-export { saveUser, checkUser, getUser, updatePassword, getProducts, saveProduct, removeProduct, updateProduct, updateUser }
+export { saveUser, authenticateUser, getUser, updatePassword, getProducts, saveProduct, removeProduct, updateProduct, updateUserData }

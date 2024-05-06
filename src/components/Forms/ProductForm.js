@@ -10,7 +10,7 @@ function ProductForm(props) {
             id: 1,
             type: "text",
             placeholder: "Nome do Produto",
-            name: "product",
+            name: "productName",
             maxLength: 30
         },
         {
@@ -19,12 +19,12 @@ function ProductForm(props) {
             placeholder: "Quantidade do Produto",
             name: "amount",
             min: 0,
-            max : 999999
+            max: 999999
         }
     ]
 
     return (
-        <form className={"w-full h-full flex flex-col items-center sm:max-lg:h-1/5 sm:max-lg:flex-row xl:flex-row  xl:justify-evenly xl:w-4/6"} onSubmit={(e) => saveNewProduct(e)}>
+        <form className={"w-full h-full flex flex-col items-center sm:max-lg:h-1/5 sm:max-lg:flex-row xl:flex-row  xl:justify-evenly xl:w-4/6"} onSubmit={(event) => saveNewProduct(event)}>
             {inputs.map((input) => {
                 return <ProductFormInput key={input.id} {...input} productFormData={productFormData} setProductFormData={setProductFormData} />
             })}

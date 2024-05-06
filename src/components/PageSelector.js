@@ -1,8 +1,7 @@
 import { React } from 'react'
 
 export function PageSelector(props) {
-
-    let { incrementPage, decrementPage, left, right, selectedPage, totalPages } = props
+    const { incrementPage, decrementPage, left, right, selectedPage, totalPages } = props
 
     return (
         <div className={"w-full h-20 mt-5"}>

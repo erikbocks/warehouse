@@ -1,75 +1,50 @@
 import { React, useState, useEffect, useReducer } from "react";
 import { UserForm } from "../Forms/UserForm";
-import { getUser, updatePassword, updateUser } from "../../api/axios";
-import Title from "../Title";
-import PasswordModal from "../PasswordModal";
+import { getUser, updatePassword, updateUserData } from "../../api/axios";
 import { Link } from "react-router-dom";
 import { BaseWhiteBox } from "../BaseWhiteBox";
 import { ExpirationModal } from "../ExpirationModal";
-import { BaseWhiteBoxOverlay } from "../BaseWhiteBoxOverlay";
+import { Title } from "../Title";
+import { PasswordModal } from "../PasswordModal";
+import { UserModal } from "../UserModal";
 
 function Account() {
-    const userId = sessionStorage.getItem("userId")
     const token = sessionStorage.getItem("authToken")
-    const [dbUser, setDbUser] = useState({})
-
-    const initials = {
-        password: {
-            currentPassword: "",
-            firstNewPassword: "",
-            secondNewPassword: ""
-        },
+    const initialStates = {
         user: {
-            username: dbUser.username,
-            email: dbUser.email,
+            username: "",
+            email: "",
+        },
+        passwordErrorInfo: {
+            status: false,
+            message: ""
+        },
+        userErrorInfo: {
+            status: false,
+            message: ""
         }
-
     }
-    const [passwordFormData, setPasswordFormData] = useState(initials.password)
-    const [userFormData, setUserFormData] = useState(initials.user)
+
+    const [dbUser, setDbUser] = useState(initialStates.user)
+    const [userFormData, setUserFormData] = useState(initialStates.user)
 
     const [state, dispatch] = useReducer(reducer, {
-        passwordErrorStatus: false,
-        userErrorStatus: false,
-        errorMessage: "",
+        passwordErrorInfo: initialStates.passwordInfos,
+        userErrorInfo: initialStates.userErrorInfo,
         isEditing: false,
-        changingPassword: false,
-        disabled: true
+        isChangingPassword: false,
+        isDisabled: true
     })
 
-    function togglePasswordChange() {
+    function togglePasswordModal() {
         dispatch({
-            type: "togglePasswordChange"
+            type: "togglePasswordModal"
         })
     }
 
-    function toggleEditing() {
+    function toggleIsEditing() {
         dispatch({
-            type: "toggleEditing"
-        })
-    }
-
-    function cancelEditing() {
-        dispatch({
-            type: "disableEditing"
-        })
-    }
-
-    function cleanPasswordAndError() {
-        dispatch({
-            type: "resetPassAndError"
-        })
-    }
-
-    function cleanErrorFeedback() {
-        dispatch({
-            type: "resetError"
-        })
-    }
-
-    function cleanUser() {
-        dispatch({
-            type: "resetUser"
+            type: "toggleIsEditing"
         })
     }
 
@@ -81,122 +56,114 @@ function Account() {
         })
     }
 
-    function checkPasswords(firstPassword, secondPassword) {
-        let status = firstPassword !== secondPassword
-        let message = status ? "As senhas não coincidem." : ""
+    function resetUserErrorInfo() {
+        dispatch({
+            type: "resetUserErrorInfo"
+        })
+    }
 
-        displayFeedback("changePasswordFeedback", status, message)
+    function resetPasswordAndErrorFields() {
+        dispatch({
+            type: "resetPasswordAndErrorFields"
+        })
+    }
+
+    function resetUserFields() {
+        dispatch({
+            type: "resetUserFields"
+        })
     }
 
     function reducer(state, action) {
         switch (action.type) {
-            case "togglePasswordChange":
-                return { ...state, changingPassword: !state.changingPassword };
-            case "toggleEditing":
-                return { ...state, isEditing: !state.isEditing, disabled: !state.disabled }
-            case "storeDatabaseUser":
-                setDbUser(action.user)
-                return {...state}
-            case "changePasswordFeedback":
-                return { ...state, passwordErrorStatus: action.status, errorMessage: action.message }
-            case "changeUserFeedback":
-                return { ...state, userErrorStatus: action.status, errorMessage: action.message }
-            case "resetPassAndError":
-                setPasswordFormData(initials.password)
-                return { ...state, errorStatus: false, errorMessage: "" }
-            case "resetUser":
-                setUserFormData(initials.user)
-                return {...state}
-            case "resetError":
-                return { ...state, userErrorStatus: false, errorMessage: "" }
+            case "togglePasswordModal":
+                return { ...state, isChangingPassword: !state.isChangingPassword };
+            case "toggleIsEditing":
+                return { ...state, isEditing: !state.isEditing, isDisabled: !state.isDisabled }
+            case "updateUserError":
+                return { ...state, userErrorInfo: { status: action.status, message: action.message } }
+            case "updatePasswordError":
+                return { ...state, passwordErrorInfo: { status: action.status, message: action.message } }
+            case "resetUserErrorInfo":
+                return { ...state, userErrorInfo: initialStates.userErrorInfo }
+            case "resetPasswordAndErrorFields":
+                return { ...state, passwordErrorInfo: initialStates.passwordErrorInfo }
+            case "resetUserFields":
+                setUserFormData(initialStates.user)
+                return { ...state }
             default:
                 return state
         }
     }
 
-    async function saveNewPassword(e) {
-        e.preventDefault()
+    async function saveNewPassword(event, currentPassword, newPassword) {
+        event.preventDefault()
 
-        let userInfos = {
-            userId: userId,
-            oldPassword: passwordFormData.currentPassword,
-            newPassword: passwordFormData.firstNewPassword
+        const userInfos = {
+            oldPassword: currentPassword,
+            newPassword: newPassword
         }
 
-        let response = await updatePassword(userInfos, token)
+        const updateResponse = await updatePassword(userInfos, token)
 
-        if (response.status === 400) {
-            displayFeedback("changePasswordFeedback", true, response.data.messages)
-            return
+        if (updateResponse.status === 400) {
+            return displayFeedback("updatePasswordErrorInfo", true, updateResponse.data.messages)
         }
 
-        if (response.code === "ERR_NETWORK") {
-            displayFeedback("changePasswordFeedback", true, "Recarregue a página ou tente novamente em 30 segundos.")
-            return
+        if (updateResponse.code === "ERR_NETWORK") {
+            return displayFeedback("updatePasswordErrorInfo", true, "Recarregue a página ou tente novamente em 30 segundos.")
         }
 
-        cleanPasswordAndError()
-
-        togglePasswordChange()
+        togglePasswordModal()
     }
 
-    async function update(e) {
-        e.preventDefault()
+    async function updateUser(event) {
+        event.preventDefault()
 
-        let userInfos = {
-            userId: userId,
+        const userInfos = {
             username: userFormData.username,
             email: userFormData.email
         }
 
-        let response = await updateUser(userInfos, token)
+        const response = await updateUserData(userInfos, token)
 
         if (response.status === 400) {
-            displayFeedback("changeUserFeedback", true, response.data.messages)
-            return
+            return displayFeedback("updateUserError", true, response.data.messages)
         }
 
         if (response.code === "ERR_NETWORK") {
-            displayFeedback("changeUserFeedback", true, "Recarregue a página ou tente novamente em 30 segundos.")
-            return
+            return displayFeedback("updateUserError", true, "Recarregue a página ou tente novamente em 30 segundos.")
         }
 
-        toggleEditing();
+        toggleIsEditing();
     }
 
     useEffect(() => {
-        getUser(userId, token).then(res => {
+        getUser(token).then(res => {
             setDbUser(res.result)
             setUserFormData({
                 username: res.result.username,
                 email: res.result.email
             })
         })
-    }, [userId, token])
-
-    useEffect(() => {
-        checkPasswords(passwordFormData.firstNewPassword, passwordFormData.secondNewPassword)
-        //eslint-disable-next-line
-    }, [passwordFormData])
-
-    console.log(state)
+    }, [token])
 
     return (
         <div className={'h-full flex flex-col justify-center items-center'}>
             <Title />
             <BaseWhiteBox styleClass={"w-4/5 h-3/5 sm:max-lg:w-1/2 sm:max-lg:h-2/5 xl:w-1/5 xl:h-1/2"}>
-                {dbUser?.id && <UserForm userFormData={userFormData} setUserFormData={setUserFormData} cleanup={cleanUser} isEditing={state.isEditing} toggleEditing={toggleEditing} cancelEditing={cancelEditing} disabled={state.disabled} togglePasswordChange={togglePasswordChange} update={update} />}
+                {dbUser?.email && <UserForm userFormData={userFormData} setUserFormData={setUserFormData} resetUserFields={resetUserFields} isEditing={state.isEditing} toggleIsEditing={toggleIsEditing} disabled={state.isDisabled} togglePasswordChange={togglePasswordModal} updateUser={updateUser} />}
                 <div className={"w-3/5 h-12 flex justify-evenly items-center"}>
                     <img src={"/list.png"} alt={"Icone de uma lista com marcações"}></img>
                     <Link className={"text-gray-500 underline"} to={"/home"}>Meu armazém</Link>
                 </div>
             </BaseWhiteBox>
-            {state.changingPassword && <PasswordModal passwordFormData={passwordFormData} errorStatus={state.passwordErrorStatus} errorMessage={state.errorMessage} setPasswordFormData={setPasswordFormData} cleanup={cleanPasswordAndError} togglePasswordChange={togglePasswordChange} saveNewPassword={saveNewPassword} />}
-            {state.userErrorStatus && <BaseWhiteBoxOverlay styleClass={"flex flex-col items-center justify-evenly w-3/5 h-1/5 sm:max-lg:w-1/3 sm:max-lg:h-1/6 xl:w-1/6 xl:h-1/6"}>
-                <p className={"w-5/6 text-center"}>{state.errorMessage}</p>
-                <button onClick={cleanErrorFeedback} className={"h-10 w-24 rounded-full bg-sky-600 text-white"}>Fechar</button>
-            </BaseWhiteBoxOverlay>}
-            {!userId && <ExpirationModal />}
+
+            {state.isChangingPassword && <PasswordModal {...state.passwordErrorInfo} displayFeedback={displayFeedback} togglePasswordModal={togglePasswordModal} resetPasswordAndErrorFields={resetPasswordAndErrorFields} saveNewPassword={saveNewPassword} />}
+
+            {state.userErrorInfo.status && <UserModal message={state.userErrorInfo.message} resetUserErrorInfo={resetUserErrorInfo} />}
+
+            {!token && <ExpirationModal />}
         </div>
 
     )

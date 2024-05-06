@@ -1,68 +1,90 @@
 import { React, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { checkUser } from '../../api/axios';
+import { authenticateUser } from '../../api/axios';
 import LoginForm from '../Forms/LoginForm';
 import ResponseAlert from '../ResponseAlert';
-import Title from '../Title';
+import { Title } from '../Title';
 
 function Login() {
-    const navigate = useNavigate()
-    const [open, setOpen] = useState(false)
-    let [title, setTitle] = useState("Erro")
-    let [message, setMessage] = useState("Ocorreu um erro. Tente novamente mais tarde.")
-    let [image, setImage] = useState({
-        imageSrc: "/error.png",
-        imageAlt: "imagem de um círculo com um X no centro indicando erro"
+    const pageNavigator = useNavigate()
+    const initialLoginState = {
+        login: "",
+        password: ""
+    }
+
+    const [loginFormData, setLoginFormData] = useState(initialLoginState)
+
+    const [alertOpen, setAlertOpen] = useState(false)
+    const [alertImage, setAlertImage] = useState({
+        imageSrc: "",
+        imageAlt: ""
     })
+    const [alertTitle, setAlertTitle] = useState("")
+    const [alertMessage, setAlertMessage] = useState("")
 
-    async function checkLogin(data) {
-        let response = await checkUser(data)
 
-        if (response.status === 400) {
-            setImage({ imageSrc: "/warning.png", imageAlt: "imagem de um triangulo com exclamação" })
-            setTitle("Dados incorretos")
-            setMessage("Login ou Senha incorretos.")
-            setOpen(true)
-            return response
+    async function loginUser(data) {
+        const authResponse = await authenticateUser(data)
+
+        if (authResponse.status === 400 || authResponse.status === 403) {
+            return setWarningAlert()
         }
 
-        if (response.status === 200) {
-            setImage({ imageSrc: "/correct.png", imageAlt: "imagem de círculo com simbolo de correto" })
-            setTitle("Autenticado!")
-            setMessage("Você vai ser redirecionado em alguns instantes.")
-            setOpen(true)
-            return response
+        if (authResponse.status === 200) {
+            setSuccessAlert()
+            return redirectToHome(authResponse)
         }
 
-        setOpen(true)
-        return response
+        setErrorAlert()
     }
 
-    async function redirect(data) {
-        let response = await checkLogin(data)
-
-        if (response.result !== undefined && response.result !== null) {
-
-            sessionStorage.setItem('userId', JSON.stringify(response.result.id))
-            sessionStorage.setItem('authToken', `Bearer ${response.result.token}`)
-
-            setTimeout(() => navigate('/home'), 5000)
-        }
+    function setWarningAlert() {
+        setAlertImage({ imageSrc: "/warning.png", imageAlt: "imagem de um triangulo com exclamação" })
+        setAlertTitle("Dados incorretos")
+        setAlertMessage("Login ou Senha incorretos.")
+        setAlertOpen(true)
     }
 
-    let infos = {
-        image: image,
-        title: title,
-        message: message,
+    function setSuccessAlert() {
+        setAlertImage({ imageSrc: "/correct.png", imageAlt: "imagem de círculo com simbolo de correto" })
+        setAlertTitle("Autenticado!")
+        setAlertMessage("Você vai ser redirecionado em alguns instantes.")
+        setAlertOpen(true)
+    }
+
+    function setErrorAlert() {
+        setAlertImage({
+            imageSrc: "/error.png",
+            imageAlt: "imagem de um sinal de erro"
+        })
+        setAlertTitle("Erro")
+        setAlertMessage("Ocorreu um erro. Tente novamente mais tarde")
+        setAlertOpen(true)
+    }
+
+    function redirectToHome(response) {
+        sessionStorage.setItem('authToken', `Bearer ${response.result.token}`)
+
+        setTimeout(() => pageNavigator('/home'), 5000)
+    }
+
+    function closeResponseAlert() {
+        setAlertOpen(false)
+    }
+
+    const alertInfos = {
+        image: alertImage,
+        title: alertTitle,
+        message: alertMessage,
     }
 
     return (
         <div className={'w-screen h-screen flex flex-col items-center justify-center overflow-hidden'}>
             <Title />
-            <LoginForm onSubmit={redirect} />
-            {open && <ResponseAlert data={infos} visible={open} setOpen={setOpen} />}
+            <LoginForm loginFormData={loginFormData} setLoginFormData={setLoginFormData} onSubmit={loginUser} />
+            {alertOpen && <ResponseAlert {...alertInfos} closeFunction={closeResponseAlert} />}
         </div>
     )
 }
 
-export default Login
+export default Login;

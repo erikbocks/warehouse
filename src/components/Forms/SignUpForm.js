@@ -1,15 +1,10 @@
-import { React, useState } from 'react'
+import { React } from 'react'
 import { Link } from "react-router-dom"
-import UserFormInput from '../Inputs/UserFormInput'
 import { BaseWhiteBox } from '../BaseWhiteBox'
+import UserFormInput from '../Inputs/UserFormInput'
 
 function SignUpForm(props) {
-
-    const [signupFormData, setSignupFormData] = useState({
-        email: "",
-        username: "",
-        password: ""
-    })
+    const { signupFormData, setSignupFormData } = props
 
     const inputs = [
         {

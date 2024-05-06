@@ -3,8 +3,8 @@ import { currencyMask } from '../utils/CurrencyMask'
 import { InputChangeHandler } from '../utils/InputChangeHandler'
 
 function ValueFormInput(props) {
-    let { productFormData, setProductFormData } = props
-    let [currencyValue, setCurrencyValue] = useState("")
+    const { productFormData, setProductFormData } = props
+    const [currencyValue, setCurrencyValue] = useState("")
 
     const handleValueChange = (e) => {
         setCurrencyValue(e.target.value)

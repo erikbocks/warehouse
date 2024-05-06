@@ -3,7 +3,7 @@ import { currencyMask } from '../utils/CurrencyMask'
 import { InputChangeHandler } from "../utils/InputChangeHandler"
 
 function ProductValueEditInput(props) {
-    let { productData, setProductData, disabled } = props
+    let { productModalData, setProductModalData, disabled } = props
 
     return (
         <div className={"w-full h-12 flex flex-row justify-evenly items-center "}>
@@ -13,10 +13,10 @@ function ProductValueEditInput(props) {
                 name={"value"}
                 type={"text"}
                 placeholder={"Valor do Produto"}
-                value={"R$ " + productData.value}
+                value={"R$ " + productModalData.value}
                 onChange={(e) => {
                     currencyMask(e)
-                    InputChangeHandler(e, productData, setProductData)
+                    InputChangeHandler(e, productModalData, setProductModalData)
                 }}
                 disabled={disabled}
                 required></input>

@@ -2,7 +2,7 @@ import { React } from 'react'
 import UserFormInput from '../Inputs/UserFormInput'
 
 export function UserForm(props) {
-    const { userFormData, setUserFormData, cleanup, isEditing, toggleEditing, disabled, togglePasswordChange, update } = props
+    const { userFormData, setUserFormData, resetUserFields, isEditing, toggleIsEditing, disabled, togglePasswordChange, updateUser } = props
 
     const inputs = [
         {
@@ -36,15 +36,19 @@ export function UserForm(props) {
                 {!isEditing && <button onClick={togglePasswordChange} className={"bg-sky-600 w-3/5 h-10 text-white rounded-full"}>
                     Mudar senha
                 </button>}
-                {!isEditing && <button onClick={toggleEditing} className={"bg-sky-600 w-3/5 h-10 text-white rounded-full"}>
+
+                {!isEditing && <button onClick={toggleIsEditing} className={"bg-sky-600 w-3/5 h-10 text-white rounded-full"}>
                     Editar
                 </button>}
-                {isEditing && <button className={"bg-green-600 w-3/5 h-10 text-white rounded-full"} onClick={(e) => update(e)}>
+
+                {isEditing && <button className={"bg-green-600 w-3/5 h-10 text-white rounded-full"} onClick={(e) => updateUser(e)}>
                     Salvar
                 </button>}
-                {isEditing && <button onClick={(e) => { toggleEditing(); cleanup() }} className={"bg-zinc-600 w-3/5 h-10 text-white rounded-full"}>
+
+                {isEditing && <button onClick={(e) => { toggleIsEditing(); resetUserFields() }} className={"bg-zinc-600 w-3/5 h-10 text-white rounded-full"}>
                     Cancelar
                 </button>}
+
                 {!isEditing && <button className={"bg-red-600 w-3/5 h-10 text-white rounded-full"}>
                     Excluir
                 </button>}
