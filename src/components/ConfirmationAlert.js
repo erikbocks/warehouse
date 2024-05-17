@@ -1,33 +1,32 @@
 import { React } from 'react'
+import { BaseWhiteBoxOverlay } from './BaseWhiteBoxOverlay'
 
 export function ConfirmationAlert(props) {
 
-    let { setOpenDeleteConfirmation, eraseClickedProduct } = props
+    let { closeFunction, confirmationFunction } = props
 
-    function handleCancelButtonClick() {
-        setOpenDeleteConfirmation(false)
+    function cancel() {
+        closeFunction()
     }
 
-    function handleEraseButtonClick() {
-        eraseClickedProduct()
-        setOpenDeleteConfirmation(false)
+    function confirm() {
+        confirmationFunction()
+        closeFunction()
     }
 
     return (
-        <div className={"fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm flex items-center justify-center"}>
-            <div className={"bg-white rounded-2xl w-2/3 h-1/6 "}>
-                <div className={"w-full h-2/4 flex items-center justify-center"}>
-                    <h1 className={"text-xl"}>Você tem certeza?</h1>
-                </div>
-                <div className={"h-2/4 flex flex-row justify-evenly items-center"}>
-                    <button onClick={handleCancelButtonClick} className={"bg-red-600 h-9 w-20 rounded-xl text-white"}>
-                        Não
-                    </button>
-                    <button onClick={handleEraseButtonClick} className={"bg-green-600 h-9 w-20 rounded-xl text-white"}>
-                        Sim
-                    </button>
-                </div>
+        <BaseWhiteBoxOverlay styleClass={"flex flex-col justify-center w-2/3 h-1/6 sm:max-lg:w-1/3 xl:w-1/6"}>
+            <div className={"w-full h-1/2 flex items-center justify-center sm:max-lg:h-1/3 xl:h-1/3"}>
+                <h1 className={"text-xl"}>Você tem certeza?</h1>
             </div>
-        </div>
+            <div className={"w-full h-auto flex flex-row justify-evenly items-center"}>
+                <button onClick={cancel} className={"bg-red-600 h-9 w-20 rounded-xl text-white sm:max-lg:w-1/3"}>
+                    Não
+                </button>
+                <button onClick={confirm} className={"bg-green-600 h-9 w-20 rounded-xl text-white sm:max-lg:w-1/3"}>
+                    Sim
+                </button>
+            </div >
+        </BaseWhiteBoxOverlay>
     )
 }

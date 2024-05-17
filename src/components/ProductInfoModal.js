@@ -1,57 +1,21 @@
-import { React, useState } from 'react'
-import { DateFormatter } from '../utils/DateFormatter'
+import { React } from 'react'
+import { DateFormatter } from './utils/DateFormatter'
+import { BaseWhiteBoxOverlay } from './BaseWhiteBoxOverlay'
 import ProductEditInput from './Inputs/ProductEditInput'
 import ProductValueEditInput from './Inputs/ProductValueEditInput'
 
 function ProductInfoModal(props) {
-    const { clickedProduct, cleanup, updateEditedProduct, setOpenDeleteConfirmation } = props
-    const [disabled, setDisabled] = useState(true)
-    const [isEditing, setIsEditing] = useState(false)
-
-    const [productData, setProductData] = useState({
-        product: clickedProduct.product,
-        amount: clickedProduct.amount,
-        value: clickedProduct.value,
-        addedOn: clickedProduct.addedOn,
-        lastEdit: clickedProduct.lastEdit
-    })
-
-    function handleCancelEditButtonClick() {
-        setDisabled(true)
-        setIsEditing(false)
-        setProductData({ ...clickedProduct })
-    }
-
-    async function handleSaveEditButtonClick(event) {
-        event.preventDefault()
-
-        await updateEditedProduct(productData)
-
-        handleCloseButtonClick()
-    }
-
-    function handleEditButtonClick() {
-        setDisabled(false)
-        setIsEditing(true)
-    }
-
-    async function handleRemoveButtonClick() {
-        setOpenDeleteConfirmation(true)
-    }
-
-    function handleCloseButtonClick() {
-        cleanup()
-        setDisabled(true)
-    }
+    const { productModalData, setProductModalData, modalFieldsDisabled, isEditingProduct, toggleEditingProduct, cancelProductEditing, resetClickedProduct, updateEditedProduct, changeIsDeleting } = props
 
     let inputs = [
         {
             id: 1,
             label: "Produto: ",
-            name: "product",
+            name: "productName",
             type: "text",
             placeholder: "Nome do Produto",
-            property: productData.product
+            maxLength: 30,
+            value: productModalData.productName
         },
         {
             id: 2,
@@ -59,32 +23,37 @@ function ProductInfoModal(props) {
             name: "amount",
             type: "number",
             placeholder: "Quantidade",
-            property: productData.amount
+            min: 0,
+            max: 999999,
+            value: productModalData.amount
         },
     ]
 
     return (
-        <div className={'fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm flex items-center justify-center'}>
-            <div className={'bg-white rounded-2xl w-11/12 h-4/6 flex flex-col justify-center md:max-lg:w-1/2 md:max-lg:h-2/5 xl:w-1/6 xl:h-2/4'}>
-                <div className={"w-full h-12 flex justify-center items-center"}>
-                    <h1 className={"text-2xl font-bold"}>Informações</h1>
-                </div>
-                <form onSubmit={(event) => { handleSaveEditButtonClick(event) }}>
+        <BaseWhiteBoxOverlay styleClass={"flex flex-col justify-center w-11/12 h-3/5 sm:max-lg:w-1/2 sm:max-lg:h-2/5 xl:w-1/5 xl:h-1/2"}>
+            <div className={"w-full h-12 flex justify-center items-center"}>
+                <h1 className={"text-2xl font-bold"}>Informações</h1>
+            </div>
+            <div className={"flex flex-col justify-center items-center"}>
+                <form onSubmit={(event) => { updateEditedProduct(event) }}>
                     {inputs.map((input) => {
-                        return <ProductEditInput key={input.id} {...input} productData={productData} setProductData={setProductData} disabled={disabled} />
+                        return <ProductEditInput key={input.id} {...input} productModalData={productModalData} setProductModalData={setProductModalData} disabled={modalFieldsDisabled} />
                     })}
-                    <ProductValueEditInput productData={productData} setProductData={setProductData} disabled={disabled} />
-                    <p className={"text-center"}>Adicionado em: {DateFormatter(productData.addedOn)}</p>
-                    <p className={"text-center"}>Editado em: {DateFormatter(productData.lastEdit)}</p>
+
+                    <ProductValueEditInput productModalData={productModalData} setProductModalData={setProductModalData} disabled={modalFieldsDisabled} />
+
+                    <p className={"text-center"}>Adicionado em: {DateFormatter(productModalData.addedOn)}</p>
+                    <p className={"text-center"}>Editado em: {DateFormatter(productModalData.lastEdit)}</p>
+
                     <div className={"flex flex-row h-12 justify-evenly items-center"}>
-                        {isEditing &&
+                        {isEditingProduct &&
                             <div>
-                                <button onClick={handleCancelEditButtonClick} className={"bg-zinc-500 w-24 h-10 text-white rounded-full"} >
+                                <button onClick={cancelProductEditing} className={"bg-zinc-500 w-24 h-10 text-white rounded-full"} >
                                     Cancelar
                                 </button>
                             </div>
                         }
-                        {isEditing &&
+                        {isEditingProduct &&
                             <div>
                                 <button type={"submit"} className={"bg-sky-600 w-24 h-10 text-white rounded-full"} >
                                     Salvar
@@ -93,22 +62,24 @@ function ProductInfoModal(props) {
                         }
                     </div>
                 </form>
-                <div className={"flex m-3 items-center justify-evenly"}>
-                    {!isEditing && <button onClick={handleEditButtonClick} className={'bg-zinc-500 w-24 h-10 text-white rounded-full'}>
-                        Editar
-                    </button>}
-                    {!isEditing && <button onClick={handleRemoveButtonClick} className={'bg-red-700 w-24 h-10 text-white rounded-full'}>
-                        Remover
-                    </button>}
+                <div className={"w-3/4 flex m-3 items-center justify-evenly"}>
+                    {!isEditingProduct &&
+                        <button onClick={toggleEditingProduct} className={'bg-zinc-500 w-24 h-10 text-white rounded-full'}>
+                            Editar
+                        </button>}
+                    {!isEditingProduct &&
+                        <button onClick={changeIsDeleting} className={'bg-red-700 w-24 h-10 text-white rounded-full'}>
+                            Remover
+                        </button>}
                 </div>
                 <div className={"w-full flex justify-center"}>
-                    {!isEditing && <button onClick={handleCloseButtonClick} className={'bg-sky-600 w-4/5 h-10 text-white rounded-full'}>
-                        Fechar
-                    </button>}
+                    {!isEditingProduct &&
+                        <button onClick={resetClickedProduct} className={'bg-sky-600 w-4/5 h-10 text-white rounded-full'}>
+                            Fechar
+                        </button>}
                 </div>
-
             </div>
-        </div>
+        </BaseWhiteBoxOverlay>
     )
 
 }

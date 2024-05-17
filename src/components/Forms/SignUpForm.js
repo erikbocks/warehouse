@@ -1,14 +1,10 @@
-import { React, useState } from 'react'
+import { React } from 'react'
 import { Link } from "react-router-dom"
+import { BaseWhiteBox } from '../BaseWhiteBox'
 import UserFormInput from '../Inputs/UserFormInput'
 
 function SignUpForm(props) {
-
-    const [signupFormData, setSignupFormData] = useState({
-        email: "",
-        username: "",
-        password: ""
-    })
+    const { signupFormData, setSignupFormData } = props
 
     const inputs = [
         {
@@ -16,65 +12,43 @@ function SignUpForm(props) {
             title: "Email",
             type: "email",
             placeholder: "Email",
-            name: "email"
+            name: "email",
+            autocomplete: "email",
+            maxLength: 40
         },
         {
             id: 2,
             title: "Usuário",
             type: "text",
             placeholder: "Usuário",
-            name: "username"
+            name: "username",
+            autocomplete: "username",
+            maxLength: 20
         },
         {
             id: 3,
             title: "Senha",
             type: "password",
             placeholder: "Senha",
-            name: "password"
+            name: "password",
+            autocomplete: "new-password",
+            maxLength: 20
         }
     ]
-
-    const verifyInfo = (data) => {
-
-        let message = ""
-        const emailRegex = /^[a-zA-Z0-9._]{3,20}@[a-zA-Z]+(?:.[a-zA-Z0-9-])+$/
-        const usernameRegex = /^[a-zA-Z0-9_.]{4,20}$/
-        const passwordRegex = /^(?=.*\d)(?=.*[A-Z])(?=.*[a-z])(?=.*[^\w\d\s:])([^\s]){8,20}$/
-
-        if (!emailRegex.test(data.email)) {
-            message = "Insira um valor de email valido."
-            return message
-        }
-
-        if (!usernameRegex.test(data.username)) {
-            message = "Seu usuário deve de 4 a 20 letras de A-Z, números e apenas os caracteres ( _ e .)"
-            return message
-        }
-
-        if (!passwordRegex.test(data.password)) {
-            message = "Sua senha deve conter pelo menos uma letra maiúscula, uma letra minúscula, um número, um caractere especial ('!@#$%^&*') e estar entre 8-20 caracteres."
-            return message
-        }
-
-        return message
-    }
 
     function handleSubmit(e) {
         e.preventDefault()
 
-        let message = verifyInfo(signupFormData)
-
         props.onSubmit({
             email: signupFormData.email,
             username: signupFormData.username,
-            password: signupFormData.password,
-            message: message
+            password: signupFormData.password
         })
     }
 
     return (
         <div className={'h-2/4 flex flex-col items-center'}>
-            <div className={'bg-white rounded-3xl flex justify-evenly flex-col w-5/6 md:max-lg:w-2/4 md:max-lg:h-3/4 xl:w-1/5 xl:h-full items-center border-2 drop-shadow-md p-5'}>
+            <BaseWhiteBox styleClass={"w-3/4 h-full sm:max-lg:w-1/2 sm:max-lg:h-4/5 xl:w-1/5"}>
                 <form className={'h-full w-1/5 flex flex-col justify-evenly items-center '} onSubmit={handleSubmit}>
                     {inputs.map((input) => {
                         return <UserFormInput key={input.id} {...input} formData={signupFormData} setFormData={setSignupFormData} />
@@ -87,7 +61,7 @@ function SignUpForm(props) {
                     Ja é cadastrado?
                     <Link className={'h-10 text-base underline text-blue-500'} to="/"> Fazer login</Link>
                 </span>
-            </div>
+            </BaseWhiteBox >
         </div>
     )
 }
