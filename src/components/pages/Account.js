@@ -30,6 +30,7 @@ function Account() {
 
     const [dbUser, setDbUser] = useState(initialStates.user)
     const [userFormData, setUserFormData] = useState(initialStates.user)
+    const [informationModalMessage, setInformationModalMessage] = useState("")
 
     const [state, dispatch] = useReducer(reducer, {
         passwordModalInfo: initialStates.passwordInfos,
@@ -160,16 +161,17 @@ function Account() {
             newPassword: newPassword
         }
 
-        const updateResponse = await updatePassword(userInfos, token)
+        const passwordUpdateResponse = await updatePassword(userInfos, token)
 
-        if (updateResponse.status === 400) {
-            return displayFeedback("updatePasswordModalInfo", true, updateResponse.data.messages)
+        if (passwordUpdateResponse.status === 400) {
+            return displayFeedback("updatePasswordModalInfo", true, passwordUpdateResponse.data.messages)
         }
 
-        if (updateResponse.code === "ERR_NETWORK") {
+        if (passwordUpdateResponse.code === "ERR_NETWORK") {
             return displayFeedback("updatePasswordModalInfo", true, "Recarregue a página ou tente novamente em 30 segundos.")
         }
 
+        setInformationModalMessage(passwordUpdateResponse.messages)
         toggleWasPasswordChanged()
     }
 
@@ -181,30 +183,36 @@ function Account() {
             email: userFormData.email
         }
 
-        const response = await updateUserData(userInfos, token)
+        const userUpdateResponse = await updateUserData(userInfos, token)
 
-        if (response.status === 400) {
-            return displayFeedback("updateUserModalInfo", true, response.data.messages)
+        if (userUpdateResponse.status === 400) {
+            return displayFeedback("updateUserModalInfo", true, userUpdateResponse.data.messages)
         }
 
-        if (response.code === "ERR_NETWORK") {
+        if (userUpdateResponse.code === "ERR_NETWORK") {
             return displayFeedback("updateUserModalInfo", true, "Recarregue a página ou tente novamente em 30 segundos.")
         }
 
+        console.log(userUpdateResponse)
+
+        setInformationModalMessage(userUpdateResponse.messages)
         toggleWasUserChanged();
     }
 
     async function removeUser() {
-        const response = await deleteUser(token)
+        const userRemoveResponse = await deleteUser(token)
 
-        if (response.status === 400) {
-            return displayFeedback("updateUserModalInfo", true, response.data.messages)
+        if (userRemoveResponse.status === 400) {
+            return displayFeedback("updateUserModalInfo", true, userRemoveResponse.data.messages)
         }
 
-        if (response.code === "ERR_NETWORK") {
+        if (userRemoveResponse.code === "ERR_NETWORK") {
             return displayFeedback("updateUserModalInfo", true, "Recarregue a página ou tente novamente em 30 segundos.")
         }
 
+        
+
+        setInformationModalMessage(userRemoveResponse.messages)
         toggleWasUserDeleted()
     }
 
@@ -241,11 +249,11 @@ function Account() {
 
             {state.userModalInfo.isOpen && <UserModal message={state.userModalInfo.message} resetUserModalInfo={resetUserModalInfo} />}
 
-            {state.wasUserChanged && <InformationModal message={"Usuário atualizado com sucesso!"} buttonFunction={closeModalAndDisableUserEditing} />}
+            {state.wasUserChanged && <InformationModal message={informationModalMessage} buttonFunction={closeModalAndDisableUserEditing} />}
 
-            {state.wasPasswordChanged && <InformationModal message={"Senha alterada com sucesso!"} buttonFunction={closeAndResetPasswordModal} />}
+            {state.wasPasswordChanged && <InformationModal message={informationModalMessage} buttonFunction={closeAndResetPasswordModal} />}
 
-            {state.wasUserDeleted && <InformationModal message={"Usuário removido com sucesso!"} buttonFunction={redirectUserAndDeleteToken} />}
+            {state.wasUserDeleted && <InformationModal message={informationModalMessage} buttonFunction={redirectUserAndDeleteToken} />}
 
             {state.isRemovingUser && <ConfirmationAlert closeFunction={toggleIsRemovingUser} confirmationFunction={removeUser} />}
 
