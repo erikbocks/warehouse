@@ -134,7 +134,7 @@ function Home() {
         event.preventDefault()
 
         const newProduct = {
-            product: productFormData.productName,
+            productName: productFormData.productName,
             amount: productFormData.amount,
             value: productFormData.value,
         }
@@ -148,12 +148,14 @@ function Home() {
 
         let toUpdateProduct = {
             id: state.productKey,
-            product: productModalData.productName,
+            productName: productModalData.productName,
             amount: productModalData.amount,
             value: productModalData.value
         }
 
         await updateProduct(toUpdateProduct, token)
+        resetClickedProduct()
+        toggleEditingProduct()
         setForceUpdate(true)
     }
 

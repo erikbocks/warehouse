@@ -28,7 +28,7 @@ function SignUp() {
             return setWarningAlert(saveResponse.data.messages)
         }
 
-        if (saveResponse.status === 200) {
+        if (saveResponse.status === 201) {
             return setSuccessAlert()
         }
 

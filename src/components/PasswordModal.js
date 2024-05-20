@@ -3,7 +3,7 @@ import { BaseWhiteBoxOverlay } from "./BaseWhiteBoxOverlay"
 import PasswordInput from "./Inputs/PasswordInput"
 
 export function PasswordModal(props) {
-    const { status, message, displayFeedback, togglePasswordModal, resetPasswordAndErrorFields, saveNewPassword } = props
+    const { isOpen, message, displayFeedback, togglePasswordModal, resetPasswordAndModalFields, saveNewPassword } = props
     const initialStates = {
         password: {
             currentPassword: "",
@@ -11,19 +11,18 @@ export function PasswordModal(props) {
             secondNewPassword: ""
         }
     }
-
     const [passwordFormData, setPasswordFormData] = useState(initialStates.password)
 
     function checkPasswords(firstPassword, secondPassword) {
         const currentStatus = firstPassword !== secondPassword
         const currentMessage = currentStatus ? "As senhas não coincidem." : ""
 
-        displayFeedback("updatePasswordError", currentStatus, currentMessage)
+        displayFeedback("updatePasswordModalInfo", currentStatus, currentMessage)
     }
 
     function resetFields() {
         setPasswordFormData(initialStates.password)
-        resetPasswordAndErrorFields()
+        resetPasswordAndModalFields()
     }
 
     const inputs = [
@@ -55,7 +54,8 @@ export function PasswordModal(props) {
 
     useEffect(() => {
         checkPasswords(passwordFormData.firstNewPassword, passwordFormData.secondNewPassword)
-    })
+        //eslint-disable-next-line
+    }, [passwordFormData.firstNewPassword, passwordFormData.secondNewPassword])
 
     return (
         <BaseWhiteBoxOverlay styleClass={"flex flex-col justify-evenly w-3/4 h-1/2 sm:max-lg:w-1/2 sm:max-lg:h-1/3 xl:w-1/6 xl:h-2/5"}>
@@ -64,14 +64,14 @@ export function PasswordModal(props) {
                     return <PasswordInput key={input.id} {...input} passwordFormData={passwordFormData} setPasswordFormData={setPasswordFormData} />
                 })}
             </div>
-            {status && <div className={"flex justify-center"}>
+            {isOpen && <div className={"flex justify-center"}>
                 <p className={"w-5/6 text-center text-red-500 text-sm"}>{message}</p>
             </div>}
             <div className={"w-4/5 h-auto flex justify-between items-center"}>
                 <button onClick={() => { togglePasswordModal(); resetFields() }} className={"w-28 h-10 rounded-xl text-white bg-gray-500"}>
                     Cancelar
                 </button>
-                <button className={"w-28 h-10 rounded-xl text-white bg-green-600 disabled:bg-zinc-400"} disabled={status} onClick={(event) => saveNewPassword(event, passwordFormData.currentPassword, passwordFormData.firstNewPassword)}>
+                <button className={"w-28 h-10 rounded-xl text-white bg-green-600 disabled:bg-zinc-400"} disabled={isOpen} onClick={(event) => saveNewPassword(event, passwordFormData.currentPassword, passwordFormData.firstNewPassword)}>
                     Salvar
                 </button>
             </div>

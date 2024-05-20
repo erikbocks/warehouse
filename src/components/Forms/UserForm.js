@@ -2,7 +2,7 @@ import { React } from 'react'
 import UserFormInput from '../Inputs/UserFormInput'
 
 export function UserForm(props) {
-    const { userFormData, setUserFormData, resetUserFields, isEditing, toggleIsEditing, disabled, togglePasswordChange, updateUser } = props
+    const { userFormData, setUserFormData, disabled, resetUserFormFields, isEditing, toggleIsEditing, toggleIsRemovingUser, togglePasswordChange, updateUser } = props
 
     const inputs = [
         {
@@ -45,11 +45,11 @@ export function UserForm(props) {
                     Salvar
                 </button>}
 
-                {isEditing && <button onClick={(e) => { toggleIsEditing(); resetUserFields() }} className={"bg-zinc-600 w-3/5 h-10 text-white rounded-full"}>
+                {isEditing && <button onClick={(e) => { toggleIsEditing(); resetUserFormFields() }} className={"bg-zinc-600 w-3/5 h-10 text-white rounded-full"}>
                     Cancelar
                 </button>}
 
-                {!isEditing && <button className={"bg-red-600 w-3/5 h-10 text-white rounded-full"}>
+                {!isEditing && <button onClick={(e) => {toggleIsRemovingUser()}} className={"bg-red-600 w-3/5 h-10 text-white rounded-full"}>
                     Excluir
                 </button>}
             </div>

@@ -42,7 +42,7 @@ function ProductInfoModal(props) {
 
                     <ProductValueEditInput productModalData={productModalData} setProductModalData={setProductModalData} disabled={modalFieldsDisabled} />
 
-                    <p className={"text-center"}>Adicionado em: {DateFormatter(productModalData.addedOn)}</p>
+                    <p className={"text-center"}>Adicionado em: {DateFormatter(productModalData.createdOn)}</p>
                     <p className={"text-center"}>Editado em: {DateFormatter(productModalData.lastEdit)}</p>
 
                     <div className={"flex flex-row h-12 justify-evenly items-center"}>

@@ -65,7 +65,7 @@ function Login() {
     function redirectToHome(response) {
         sessionStorage.setItem('authToken', `Bearer ${response.result.token}`)
 
-        setTimeout(() => pageNavigator('/home'), 5000)
+        setTimeout(() => pageNavigator('/home'), 3000)
     }
 
     function closeResponseAlert() {
