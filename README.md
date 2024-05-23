@@ -6,7 +6,7 @@ O Warehouse nasceu com o intuito de ser um projeto de estudo de desenvolvimento 
 
 É uma aplicação web, que visa efetuar as quatro operações básicas do CRUD (Create, Read, Update e Delete). Possui registro e autenticação de usuário, edição dos dados e remoção. Assim como, também possibilita a inserção de produtos em uma tabela, onde os mesmos podem ser editados e removidos. É realizada a comunicação com um banco de dados relacional através da seguinte api:
 
-- [Warehouse API](https://github.com/erikbocks/warehouse-api)
+- [Warehouse API - Git Hub](https://github.com/erikbocks/warehouse-api)
 
 ## Tecnologias
 
@@ -18,4 +18,6 @@ O Warehouse nasceu com o intuito de ser um projeto de estudo de desenvolvimento 
 
 ## Como usar
 
-Instruções sobre como utilizar o projeto e exemplos relevantes.
+Atualmente, a aplicação está hospedada no Vercel, disponível no link abaixo:
+
+- [Armazém do Bock](https://warehouse-bock.vercel.app/)
